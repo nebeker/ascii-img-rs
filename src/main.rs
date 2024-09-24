@@ -1,4 +1,5 @@
 use clap::Parser;
+use image::ImageReader;
 
 #[derive(Parser)]
 struct Cli {
@@ -10,6 +11,8 @@ struct Cli {
 
 fn main() {
     let args = Cli::parse();
+
+    let img = ImageReader::open(&args.input).unwrap().decode().unwrap();
 
     println!("Hello, world!");
     println!(
