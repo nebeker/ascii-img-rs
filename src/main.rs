@@ -30,11 +30,11 @@ fn setup_value_conversion() -> HashMap<u8, char> {
 }
 
 fn convert_pixel(value: u8, conversion_map: &HashMap<u8, char>) -> char {
-    let max_supported_value = conversion_map.keys().max().unwrap();
+    let max_supported_value: f32 = conversion_map.keys().max().unwrap().clone().into();
 
-    let normalized_value = value / 255 * max_supported_value;
+    let search_value = ((value as f32 / 255.0) * max_supported_value).round() as u8;
 
-    conversion_map.get(&normalized_value).unwrap().clone()
+    conversion_map.get(&search_value).unwrap().clone()
 }
 
 fn main() {
@@ -51,18 +51,6 @@ fn main() {
     let converted_values = values
         .into_iter()
         .map(|v| convert_pixel(v, &conversion_map));
-
-    println!("Hello, world!");
-    println!(
-        "input path: {:?}, output path: {:?}",
-        args.input, args.output
-    );
-
-    println!(
-        "convert 20: {:?} ({:?}",
-        convert_pixel(20, &conversion_map),
-        conversion_map
-    );
 
     println!("image luma values: {:?})", converted_values);
 }
@@ -86,13 +74,13 @@ mod tests {
     #[test]
     fn convert_vec() {
         let conversion_map = setup_value_conversion();
-        let values = vec![0, 24, 48, 128, 255];
+        let values = vec![0, 5, 40, 128, 255];
         assert_eq!(
             values
                 .into_iter()
                 .map(|v| convert_pixel(v, &conversion_map))
                 .collect::<Vec<char>>(),
-            vec![' ', ' ', ' ', '+', '@']
+            vec![' ', ' ', '.', '+', '@']
         );
     }
 }
