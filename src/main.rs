@@ -1,7 +1,7 @@
-use std::collections::HashMap;
-
 use clap::Parser;
 use image::{DynamicImage, ImageReader};
+use std::io::Write;
+use std::{collections::HashMap, fs::File};
 
 #[derive(Parser)]
 struct Cli {
@@ -37,7 +37,7 @@ fn convert_pixel(value: u8, conversion_map: &HashMap<u8, char>) -> char {
     conversion_map.get(&search_value).unwrap().clone()
 }
 
-fn main() {
+fn main() -> Result<(), std::io::Error> {
     let args = Cli::parse();
 
     let conversion_map = setup_value_conversion();
@@ -53,10 +53,15 @@ fn main() {
         .map(|v| convert_pixel(*v, &conversion_map))
         .collect();
 
+    let mut output_file = File::create(args.output)?;
+
     for line in values.chunks(width) {
         let printable: String = line.iter().collect();
-        println!("{0}", printable);
+        println!("{}", &printable);
+        writeln!(&mut output_file, "{}", printable)?;
     }
+
+    Ok(())
 }
 
 #[cfg(test)]
