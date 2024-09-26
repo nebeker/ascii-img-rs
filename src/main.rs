@@ -45,14 +45,18 @@ fn main() {
     let img = ImageReader::open(&args.input).unwrap().decode().unwrap();
 
     let resized_image = resize_for_console(img);
+    let width: usize = resized_image.width() as usize;
 
-    let values = resized_image.into_luma8().into_vec();
-
-    let converted_values = values
+    let values: Vec<char> = resized_image
+        .into_luma8()
         .into_iter()
-        .map(|v| convert_pixel(v, &conversion_map));
+        .map(|v| convert_pixel(*v, &conversion_map))
+        .collect();
 
-    println!("image luma values: {:?})", converted_values);
+    for line in values.chunks(width) {
+        let printable: String = line.iter().collect();
+        println!("{0}", printable);
+    }
 }
 
 #[cfg(test)]
